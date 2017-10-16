@@ -77,3 +77,5 @@ print(df2p)
 
 print(df2['MeanSalary'].sum())
 print(df2p['MeanSalary'].sum())
+
+bad code that ruins everything
