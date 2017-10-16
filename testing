@@ -1,0 +1,79 @@
+import pandas as pd
+import numpy as np
+import pandasql
+
+
+#os.chdir("")
+
+tester = pd.read_csv('C:/Users/tibeg/Desktop/testing.csv')
+tester['ID']=tester.index
+
+tester['Employees'] = np.random.random_integers(10,1000,100)
+
+print(tester['Salary'].min())
+print(tester['Salary'].max())
+percentile = lambda x: np.percentile(tester['Salary'],x)
+
+for i in range(10,110,10):
+        print(percentile(i))
+
+
+
+tester['Salary_Group'] = "<=2143"
+
+tester.loc[(tester['Salary'] > 2143) & (tester['Salary'] <= 3746.2), 'Salary_Group'] = "<=3746.2"
+tester.loc[(tester['Salary'] > 3746.2) & (tester['Salary'] <= 6087.4), 'Salary_Group'] = "<=6087.4"
+tester.loc[(tester['Salary'] > 6087.4) & (tester['Salary'] <= 8229.4), 'Salary_Group'] = "<=8229.4"
+tester.loc[(tester['Salary'] > 8229.4), 'Salary_Group'] = ">8229.4"
+
+testerpre = tester.copy()
+
+print(testerpre)
+
+tester.set_value(99,'Cat','B')
+
+
+print(tester)
+
+def laplacemech(x,epsilon):
+    x += np.random.laplace(0,epsilon, 1)[0]
+    return x
+
+
+
+output = testerpre[testerpre['Salary']> 1000].groupby(testerpre['Cat'])['Employees'].mean()
+
+print(output)
+
+output2 = tester[tester['Salary']> 1000].groupby(tester['Cat'])['Employees'].mean()
+
+print(output2)
+
+
+df = pandasql.sqldf('''SELECT tester.Cat, avg(tester.Salary) as MeanSalary , count(tester.Salary) as N
+FROM tester WHERE tester.Salary_Group != '>8229.4' GROUP BY tester.cat;''')
+
+
+dfp = pandasql.sqldf('''SELECT testerpre.Cat, avg(testerpre.Salary) as MeanSalary , count(testerpre.Salary) as N
+FROM testerpre WHERE testerpre.Salary_Group != '>8229.4' GROUP BY testerpre.cat;''')
+
+
+#df = pd.read_sql(query, globals())
+
+
+
+df2 = df.copy()
+df2p = dfp.copy()
+
+print(df)
+print(dfp)
+
+df2['MeanSalary'] = df2['MeanSalary'].apply(laplacemech, args=(2,))
+print(df2)
+
+
+df2p['MeanSalary'] = df2p['MeanSalary'].apply(laplacemech, args=(2,))
+print(df2p)
+
+print(df2['MeanSalary'].sum())
+print(df2p['MeanSalary'].sum())
